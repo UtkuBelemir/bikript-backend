@@ -7,7 +7,7 @@ import (
 
 type UserInfo struct {
 	Email               string          `json:"email" gorm:"column:email;primary_key;default"`
-	PhoneNumber         string          `json:"phone" gorm:"column:phone_number;default"`
+	PhoneNumber         string          `json:"phone_number" gorm:"column:phone_number;default"`
 	Password            string          `json:"password" gorm:"column:password;default"`
 	IsVerified          bool            `json:"is_verified" gorm:"column:is_verified;default"`
 	Referrer            string          `json:"referrer" gorm:"column:referrer;default"`

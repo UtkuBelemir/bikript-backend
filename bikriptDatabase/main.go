@@ -9,12 +9,12 @@ import (
 )
 //Connection type for creating new database connection
 type Connection struct {
-	DBConeciton *gorm.DB
+	DBConneciton *gorm.DB
 	DBerr       error
 }
 func NewConnection() *Connection {
 	cnn := new(Connection)
-	cnn.DBConeciton, cnn.DBerr = gorm.Open("postgres", "user=repidb password=23UktuBele23 dbname=bikript sslmode=disable")
+	cnn.DBConneciton, cnn.DBerr = gorm.Open("postgres", "user=repidb password=23UktuBele23 dbname=bikript sslmode=disable")
 	if cnn.DBerr != nil {
 		log.Println(cnn.DBerr)
 		return nil
@@ -23,7 +23,7 @@ func NewConnection() *Connection {
 }
 //This function saves given struct to database
 func (dbCnn Connection) DBSave(tData interface{}) error {
-	tx := dbCnn.DBConeciton.Begin()
+	tx := dbCnn.DBConneciton.Begin()
 	if tx.Error != nil {return tx.Error}
 	switch newData := tData.(type) {
 	case bikriptModels.UserInfo:
@@ -58,7 +58,7 @@ func (dbCnn Connection) DBSave(tData interface{}) error {
 }
 //This function updates given struct in database
 func (dbCnn Connection) DBUpdate(tData interface{}) error {
-	tx := dbCnn.DBConeciton.Begin()
+	tx := dbCnn.DBConneciton.Begin()
 	if tx.Error != nil {return tx.Error}
 	switch newData := tData.(type) {
 	case bikriptModels.UserInfo:
@@ -93,7 +93,7 @@ func (dbCnn Connection) DBUpdate(tData interface{}) error {
 }
 //This function deletes given struct from database
 func (dbCnn Connection) DBDelete(tData interface{}) error {
-	tx := dbCnn.DBConeciton.Begin()
+	tx := dbCnn.DBConneciton.Begin()
 	if tx.Error != nil {return tx.Error}
 	switch newData := tData.(type) {
 	case bikriptModels.UserInfo:

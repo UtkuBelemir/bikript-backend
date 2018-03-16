@@ -9,22 +9,13 @@ import (
 )
 //ENDPOINT IS : www.bikript.com/bk-api/ {{ function-name-with-lowercase-without-method }}
 /*-------------------- PROTECTED ROUTES --------------------*/
-func (bkHand BikriptHandlers) ProfileDetailsGET(wri http.ResponseWriter, req *http.Request) {
+func (bkHand BikriptHandlers) ProfileDetails(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
-	if req.Method != http.MethodGet {
-		bkHand.MethodNotAllowed(wri, http.StatusMethodNotAllowed)
-		return
-	} else {
-
-	}
-}
-func (bkHand BikriptHandlers) ProfileDetailsPUT(wri http.ResponseWriter, req *http.Request) {
 	//TODO : ERROR HANDLİNG
-	SetCORS(wri)
-	if req.Method != http.MethodPut {
-		bkHand.MethodNotAllowed(wri, http.StatusMethodNotAllowed)
+	if req.Method == http.MethodPost {
 		return
-	} else {
+	}
+	if req.Method == http.MethodPut{
 		var tempUserData bikriptModels.UserInfo
 		json.NewDecoder(req.Body).Decode(&tempUserData)
 		if tempUserData.Email == "" {
@@ -32,6 +23,18 @@ func (bkHand BikriptHandlers) ProfileDetailsPUT(wri http.ResponseWriter, req *ht
 			return
 		}
 		bkHand.DBConnection.DBUpdate(tempUserData)
+	} else {
+
+	}
+}
+func (bkHand BikriptHandlers) ProfileDetailsPUT(wri http.ResponseWriter, req *http.Request) {
+
+	SetCORS(wri)
+	if req.Method != http.MethodPut {
+		bkHand.MethodNotAllowed(wri, http.StatusMethodNotAllowed)
+		return
+	} else {
+
 	}
 	//Name,Surname,Phone,BirthDay
 }
@@ -44,10 +47,10 @@ func (bkHand BikriptHandlers) AccountVerificationPOST(wri http.ResponseWriter, r
 
 	}
 }
-
 /*--------------------  PUBLIC  ROUTES  --------------------*/
 func (bkHand BikriptHandlers) SignUpPOST(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
+	//TODO : ERROR ORDERS !
 	if req.Method != http.MethodPost {
 		bkHand.MethodNotAllowed(wri, http.StatusMethodNotAllowed)
 		return
@@ -65,23 +68,56 @@ func (bkHand BikriptHandlers) SignUpPOST(wri http.ResponseWriter, req *http.Requ
 			return
 		}
 		tempUser.Password = string(encryptedPassword)
+		fmt.Println(tempUser)
 		err = bkHand.DBConnection.DBSave(tempUser)
 		if err != nil{
 			if err.Error() == `pq: duplicate key value violates unique constraint "users_pkey"`{
 				json.NewEncoder(wri).Encode(EmailInUse)
+			} else if err.Error() == `pq: null value in column "phone_number" violates not-null constraint`{
+				json.NewEncoder(wri).Encode(PhoneNumberNotNull)
+			} else if err.Error() == `pq: null value in column "email" violates not-null constraint`{
+				json.NewEncoder(wri).Encode(EmailNotNull)
+			} else if err.Error() == `pq: null value in column "password" violates not-null constraint`{
+				json.NewEncoder(wri).Encode(PasswordNotNull)
+			} else{
+				fmt.Println("UNKNOWN ERROR :",err)
 			}
-			fmt.Println("ERROR :",err)
 			return
 		}
 		json.NewEncoder(wri).Encode(SignUpSuccess)
 	}
 }
 func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Request) {
+	//TODO : ERROR HANDLING
 	SetCORS(wri)
 	if req.Method != http.MethodPost {
 		bkHand.MethodNotAllowed(wri, 405)
 		return
 	} else {
-
+		var tempUserData,fetchedUser bikriptModels.UserInfo
+		json.NewDecoder(req.Body).Decode(&tempUserData)
+		if len(tempUserData.Email) <= 0 || len(tempUserData.Password) <= 8{
+			json.NewEncoder(wri).Encode(EmailOrPassWrong)
+			return
+		}
+		bkHand.DBConnection.DBConneciton.First(&fetchedUser,"email = ?",tempUserData.Email)
+		if fetchedUser.Email == "" {
+			json.NewEncoder(wri).Encode(EmailOrPassWrong)
+			return
+		}
+		err := bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password),[]byte(tempUserData.Password))
+		if err != nil {
+			json.NewEncoder(wri).Encode(EmailOrPassWrong)
+			return
+		}
+		var rTok ReturnCredentials
+		rTok.Token,err = CreateJwtToken(fetchedUser.Email)
+		if err != nil{
+			fmt.Println("webSocket/handlers.go - UserLogin,CreateJwtToken : "+err.Error())
+			return
+		}
+		rTok.Email = fetchedUser.Email
+		json.NewEncoder(wri).Encode(rTok)
+		return
 	}
 }

@@ -9,10 +9,15 @@ import (
 	"net/http"
 	"fmt"
 )
-
+//TODO : FIX PATHS
+/*
+export BACKENDPATH="$HOME/Borsa/bikript_backend"
+export PRIVRSA="$BACKENDPATH/keys/superscretkey.rsa"
+export PUBRSA="$BACKENDPATH/keys/superscretkey.rsa.pub"
+ */
 const (
-	privateKeyPath = "../keys/superscretkey.rsa"
-	publicKeyPath  = "../keys/superscretkey.rsa.pub"
+	privateKeyPath = "/Users/utkuelmalioglu/Borsa/bikript-backend/keys/superscretkey.rsa"
+	publicKeyPath  = "/Users/utkuelmalioglu/Borsa/bikript-backend/keys/superscretkey.rsa.pub"
 )
 
 var (
