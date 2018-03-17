@@ -68,7 +68,6 @@ func (bkHand BikriptHandlers) SignUpPOST(wri http.ResponseWriter, req *http.Requ
 			return
 		}
 		tempUser.Password = string(encryptedPassword)
-		fmt.Println(tempUser)
 		err = bkHand.DBConnection.DBSave(tempUser)
 		if err != nil{
 			if err.Error() == `pq: duplicate key value violates unique constraint "users_pkey"`{
@@ -120,4 +119,17 @@ func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Reque
 		json.NewEncoder(wri).Encode(rTok)
 		return
 	}
+}
+func (bkHand BikriptHandlers) IsLoggedInPOST(wri http.ResponseWriter,req *http.Request){
+	//TODO : ERROR HANDLING
+	//TODO : Return New Token
+	SetCORS(wri)
+	if req.Method == http.MethodPost{
+		if IsTokenAcceptable(req){
+			json.NewEncoder(wri).Encode(&TokenValid)
+		}else{
+			json.NewEncoder(wri).Encode(&TokenIsNotValid)
+		}
+	}
+	return
 }

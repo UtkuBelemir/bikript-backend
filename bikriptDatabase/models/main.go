@@ -18,10 +18,10 @@ type UserInfo struct {
 	DocumentPicturePath string          `json:"document_picture_path" gorm:"document_picture_path;default"`
 	SelfiePicturePath   string          `json:"selfie_picture_path" gorm:"selfie_picture_path;default"`
 }
-
 func (UserInfo) TableName() string {
 	return "sc_user.users"
 }
+
 type BuyOrder struct {
 	RecordId     string    `json:"record_id" gorm:"column:record_id;primary_key"`
 	UserId       string    `json:"user_id" gorm:"column:user_id"`
@@ -32,7 +32,6 @@ type BuyOrder struct {
 	CoinType     string    `json:"coin_type" gorm:"-"`
 	PairType     string    `json:"pair_type" gorm:"-"`
 }
-
 func (b BuyOrder) TableName() string {
 	return strings.ToLower("sc_" + b.CoinType + ".buy_orders_" + b.PairType)
 }
@@ -47,7 +46,6 @@ type SellOrder struct {
 	CoinType     string    `json:"coin_type" gorm:"-"`
 	PairType     string    `json:"pair_type" gorm:"-"`
 }
-
 func (s SellOrder) TableName() string {
 	return strings.ToLower("sc_" + s.CoinType + ".sell_orders_" + s.PairType)
 }
@@ -58,7 +56,6 @@ type WalletAddresses struct {
 	LastSyncTime  time.Time `json:"last_sync_time" gorm:"column:last_sync_time;default"`
 	CoinType      string    `json:"coin_type" gorm:"-"`
 }
-
 func (wa WalletAddresses) TableName() string {
 	return strings.ToLower("sc_" + wa.CoinType + ".wallet_addresses")
 }
@@ -69,7 +66,6 @@ type Balances struct {
 	ETHBalance float64 `json:"eth_balance" gorm:"column:eth_balance"`
 	TRYBalance float64 `json:"try_balance" gorm:"column:try_balance"`
 }
-
 func (Balances) TableName() string {
 	return "sc_user.users_balances"
 }
@@ -85,7 +81,6 @@ type TradeHistory struct {
 	CoinType        string    `json:"coin_type" gorm:"-"`
 	PairType        string    `json:"coin_type" gorm:"-"`
 }
-
 func (th TradeHistory) TableName() string {
 	return strings.ToLower("sc_" + th.CoinType + ".trade_history_" + th.PairType)
 }
@@ -97,7 +92,6 @@ type MailQueue struct {
 	Status      int       `json:"status" gorm:"column:status"`
 	SendDate    time.Time `json:"send_date" gorm:"column:send_date;default"`
 }
-
 func (MailQueue) TableName() string {
 	return "sc_queue.mail_queue"
 }
@@ -109,7 +103,6 @@ type SMSQueue struct {
 	Status      int       `json:"status" gorm:"column:status"`
 	SendDate    time.Time `json:"send_date" gorm:"column:send_date;default"`
 }
-
 func (SMSQueue) TableName() string {
 	return "sc_queue.sms_queue"
 }
@@ -120,7 +113,6 @@ type ActivationCodes struct {
 	Type      string `json:"type" gorm:"column:type"` // sms or email
 	ExpiresAt string `json:"expires_at" gorm:"column:expires_at;default"`
 }
-
 func (ActivationCodes) TableName() string {
 	return "sc_user.activation_codes"
 }
@@ -129,7 +121,6 @@ type LoginLogs struct {
 	UserId string  `json:"user_id" gorm:"column:user_id;primary_key"`
 	Logs   LogsMdl `json:"logins" gorm:"column:logins"`
 }
-
 func (LoginLogs) TableName() string {
 	return "sc_user.login_logs"
 }

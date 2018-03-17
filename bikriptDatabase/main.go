@@ -6,6 +6,7 @@ import (
 	bikriptModels "./models"
 	"reflect"
 	"errors"
+	"fmt"
 )
 //Connection type for creating new database connection
 type Connection struct {
@@ -64,28 +65,37 @@ func (dbCnn Connection) DBUpdate(tData interface{}) error {
 	case bikriptModels.UserInfo:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.BuyOrder:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.TradeHistory:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.SellOrder:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.WalletAddresses:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.SMSQueue:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.MailQueue:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	case bikriptModels.LoginLogs:
 		if err := tx.Model(&newData).Debug().Update(&newData).Error; err != nil {tx.Rollback();return err}
 		if err := tx.Commit().Error; err != nil {return err}
+		break
 	default:
+		fmt.Println("NEW DATA",newData)
 		return errors.New("Unknown type : "+reflect.TypeOf(newData).String())
 	}
 

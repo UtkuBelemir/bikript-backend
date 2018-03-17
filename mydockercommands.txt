@@ -1,0 +1,5 @@
+>>>>>>>>>> POSTGRESQL <<<<<<<<<<
+
+sudo docker run -d -e TZ=Turkey -e POSTGRES_USER=repidb -e POSTGRES_PASSWORD=23UktuBele23 -v ~/dockerVolumes/borsa-postgres/config:/var/lib/postgresql/data -v ~/dockerVolumes/borsa-postgres/data:/opt -p 5432:5432 --name borsa-postgres postgres
+
+CREATE DATABASE bikript WITH owner=repidb encoding='UTF-8' template template0;

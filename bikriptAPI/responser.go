@@ -1,20 +1,22 @@
 package bikriptAPI
-type ResponseModel struct {
-	Type    string	`json:"type"`
-	Message string	`json:"message"`
+type ResponseError struct {
+	Error    string	`json:"err"`
 }
 type ReturnCredentials struct {
 	Token 		string	`json:"token"`
 	Email		string	`json:"email"`
 }
 var(
-	ShortPassword = ResponseModel{Message:"short_password",Type:"error"}
-	EmailTypo = ResponseModel{Message:"wrong_email",Type:"error"}
-	EmailInUse = ResponseModel{Message:"email_or_phone_in_use",Type:"error"}
-	PhoneNumberInUse = ResponseModel{Message:"phone_number_in_use",Type:"error"}
-	SignUpSuccess = ResponseModel{Message:"signup_success",Type:"success"}
-	EmailOrPassWrong = ResponseModel{Message:"email_or_password_wrong",Type:"error"}
-	PasswordNotNull = ResponseModel{Message:"password_cannot_be_null",Type:"error"}
-	EmailNotNull = ResponseModel{Message:"email_cannot_be_null",Type:"error"}
-	PhoneNumberNotNull = ResponseModel{Message:"phone_number_cannot_be_null",Type:"error"}
+	ShortPassword = ResponseError{Error:"short_password"}
+	EmailTypo = ResponseError{Error:"wrong_email"}
+	EmailInUse = ResponseError{Error:"email_or_phone_in_use"}
+	PhoneNumberInUse = ResponseError{Error:"phone_number_in_use"}
+	SignUpSuccess = make(map[string]string)
+	EmailOrPassWrong = ResponseError{Error:"email_or_password_wrong"}
+	PasswordNotNull = ResponseError{Error:"password_cannot_be_null"}
+	EmailNotNull = ResponseError{Error:"email_cannot_be_null"}
+	PhoneNumberNotNull = ResponseError{Error:"phone_number_cannot_be_null"}
+	UserAlreadyHaveAnAddress = ResponseError{Error:"user_have_an_address"}
+	TokenIsNotValid = ResponseError{Error:"token_expired_or_not_valid"}
+	TokenValid = make(map[string]string)
 )
