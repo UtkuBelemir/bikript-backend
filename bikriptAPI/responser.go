@@ -12,6 +12,7 @@ var(
 	EmailInUse = ResponseError{Error:"email_or_phone_in_use"}
 	PhoneNumberInUse = ResponseError{Error:"phone_number_in_use"}
 	SignUpSuccess = make(map[string]string)
+	UpdateSuccess = make(map[string]string)
 	EmailOrPassWrong = ResponseError{Error:"email_or_password_wrong"}
 	PasswordNotNull = ResponseError{Error:"password_cannot_be_null"}
 	EmailNotNull = ResponseError{Error:"email_cannot_be_null"}

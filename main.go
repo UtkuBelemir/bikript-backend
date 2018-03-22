@@ -13,6 +13,7 @@ func main() {
 	//NOT PROTECTED ROUTES
 	router.HandleFunc("/",myHandlers.Index)
 	router.HandleFunc("/profiledetails",myHandlers.ProfileDetails)
+	router.HandleFunc("/getwallet/{cointype}",myHandlers.GetUserWallet)
 	router.HandleFunc("/login",myHandlers.LoginPOST)
 	router.HandleFunc("/create",myHandlers.CreateWalletAddressPOST)
 	router.HandleFunc("/signup",myHandlers.SignUpPOST)

@@ -8,7 +8,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"fmt"
+	"errors"
 )
+
 //TODO : FIX PATHS
 /*
 export BACKENDPATH="$HOME/Borsa/bikript_backend"
@@ -27,7 +29,7 @@ var (
 
 type TokenClaims struct {
 	jwt.StandardClaims
-	Name string `json:"name"`
+	Email string `json:"email"`
 }
 
 func initializeKeys(keyType string) {
@@ -103,4 +105,14 @@ func IsTokenAcceptableForSocket(req *http.Request) bool {
 	}
 	fmt.Println("KEY IS NOT ACCEPTABLE ! : " + err.Error())
 	return false
+}
+func JWTData(curToken string) (jwt.MapClaims,error) {
+	initializeKeys("pub")
+	bikriptToken, err := jwt.Parse(curToken, func(token *jwt.Token) (interface{}, error) {
+		return verifyKey, nil
+	})
+	if err == nil && bikriptToken.Valid {
+		return bikriptToken.Claims.(jwt.MapClaims),nil
+	}
+	return nil,errors.New("token is not valid")
 }

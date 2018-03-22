@@ -7,24 +7,29 @@ import (
 	"fmt"
 	bikriptModels "../bikriptDatabase/models"
 )
+
 //ENDPOINT IS : www.bikript.com/bk-api/ {{ function-name-with-lowercase-without-method }}
 /*-------------------- PROTECTED ROUTES --------------------*/
 func (bkHand BikriptHandlers) ProfileDetails(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
 	//TODO : ERROR HANDLİNG
 	if req.Method == http.MethodPost {
-		return
-	}
-	if req.Method == http.MethodPut{
 		var tempUserData bikriptModels.UserInfo
 		json.NewDecoder(req.Body).Decode(&tempUserData)
 		if tempUserData.Email == "" {
 			fmt.Fprintln(wri, "E-Mail is missing") // BK-ERROR
 			return
 		}
-		bkHand.DBConnection.DBUpdate(tempUserData)
-	} else {
-
+		err := bkHand.DBConnection.DBUpdate(tempUserData)
+		if err != nil {
+			if err.Error() == `pq: duplicate key value violates unique constraint "users_pkey"` {
+				json.NewEncoder(wri).Encode(EmailInUse)
+			} else {
+				fmt.Println("UNKNOWN ERROR :", err)
+			}
+			return
+		}
+		json.NewEncoder(wri).Encode(UpdateSuccess)
 	}
 }
 func (bkHand BikriptHandlers) ProfileDetailsPUT(wri http.ResponseWriter, req *http.Request) {
@@ -47,6 +52,7 @@ func (bkHand BikriptHandlers) AccountVerificationPOST(wri http.ResponseWriter, r
 
 	}
 }
+
 /*--------------------  PUBLIC  ROUTES  --------------------*/
 func (bkHand BikriptHandlers) SignUpPOST(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
@@ -69,17 +75,17 @@ func (bkHand BikriptHandlers) SignUpPOST(wri http.ResponseWriter, req *http.Requ
 		}
 		tempUser.Password = string(encryptedPassword)
 		err = bkHand.DBConnection.DBSave(tempUser)
-		if err != nil{
-			if err.Error() == `pq: duplicate key value violates unique constraint "users_pkey"`{
+		if err != nil {
+			if err.Error() == `pq: duplicate key value violates unique constraint "users_pkey"` {
 				json.NewEncoder(wri).Encode(EmailInUse)
-			} else if err.Error() == `pq: null value in column "phone_number" violates not-null constraint`{
+			} else if err.Error() == `pq: null value in column "phone_number" violates not-null constraint` {
 				json.NewEncoder(wri).Encode(PhoneNumberNotNull)
-			} else if err.Error() == `pq: null value in column "email" violates not-null constraint`{
+			} else if err.Error() == `pq: null value in column "email" violates not-null constraint` {
 				json.NewEncoder(wri).Encode(EmailNotNull)
-			} else if err.Error() == `pq: null value in column "password" violates not-null constraint`{
+			} else if err.Error() == `pq: null value in column "password" violates not-null constraint` {
 				json.NewEncoder(wri).Encode(PasswordNotNull)
-			} else{
-				fmt.Println("UNKNOWN ERROR :",err)
+			} else {
+				fmt.Println("UNKNOWN ERROR :", err)
 			}
 			return
 		}
@@ -93,26 +99,26 @@ func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Reque
 		bkHand.MethodNotAllowed(wri, 405)
 		return
 	} else {
-		var tempUserData,fetchedUser bikriptModels.UserInfo
+		var tempUserData, fetchedUser bikriptModels.UserInfo
 		json.NewDecoder(req.Body).Decode(&tempUserData)
-		if len(tempUserData.Email) <= 0 || len(tempUserData.Password) <= 8{
+		if len(tempUserData.Email) <= 0 || len(tempUserData.Password) <= 8 {
 			json.NewEncoder(wri).Encode(EmailOrPassWrong)
 			return
 		}
-		bkHand.DBConnection.DBConneciton.First(&fetchedUser,"email = ?",tempUserData.Email)
+		bkHand.DBConnection.DBConneciton.First(&fetchedUser, "email = ?", tempUserData.Email)
 		if fetchedUser.Email == "" {
 			json.NewEncoder(wri).Encode(EmailOrPassWrong)
 			return
 		}
-		err := bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password),[]byte(tempUserData.Password))
+		err := bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(tempUserData.Password))
 		if err != nil {
 			json.NewEncoder(wri).Encode(EmailOrPassWrong)
 			return
 		}
 		var rTok ReturnCredentials
-		rTok.Token,err = CreateJwtToken(fetchedUser.Email)
-		if err != nil{
-			fmt.Println("webSocket/handlers.go - UserLogin,CreateJwtToken : "+err.Error())
+		rTok.Token, err = CreateJwtToken(fetchedUser.Email)
+		if err != nil {
+			fmt.Println("webSocket/handlers.go - UserLogin,CreateJwtToken : " + err.Error())
 			return
 		}
 		rTok.Email = fetchedUser.Email
@@ -120,14 +126,14 @@ func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Reque
 		return
 	}
 }
-func (bkHand BikriptHandlers) IsLoggedInPOST(wri http.ResponseWriter,req *http.Request){
+func (bkHand BikriptHandlers) IsLoggedInPOST(wri http.ResponseWriter, req *http.Request) {
 	//TODO : ERROR HANDLING
 	//TODO : Return New Token
 	SetCORS(wri)
-	if req.Method == http.MethodPost{
-		if IsTokenAcceptable(req){
+	if req.Method == http.MethodPost {
+		if IsTokenAcceptable(req) {
 			json.NewEncoder(wri).Encode(&TokenValid)
-		}else{
+		} else {
 			json.NewEncoder(wri).Encode(&TokenIsNotValid)
 		}
 	}
