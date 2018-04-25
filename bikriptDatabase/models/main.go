@@ -25,7 +25,20 @@ type UserInfo struct {
 func (UserInfo) TableName() string {
 	return "sc_user.users"
 }
-
+type UserInfoGET struct {
+	Email               string          `json:"email" gorm:"column:email;primary_key;default"`
+	PhoneNumber         string          `json:"phone_number" gorm:"column:phone_number;default"`
+	PhoneNumberPre      string        	`json:"phone_number_pre" gorm:"column:phone_number_pre;default"`
+	Name                string          `json:"name" gorm:"name;default"`
+	Surname             string          `json:"surname" gorm:"surname;default"`
+	BirthDay            time.Time       `json:"birth_day" gorm:"birth_day;default"`
+	DocumentNumber      string          `json:"document_number" gorm:"document_number;default"`
+	DocumentPicturePath string          `json:"document_picture_path" gorm:"document_picture_path;default"`
+	SelfiePicturePath   string          `json:"selfie_picture_path" gorm:"selfie_picture_path;default"`
+}
+func (UserInfoGET) TableName() string {
+	return "sc_user.users"
+}
 type BuyOrder struct {
 	RecordId     string    `json:"record_id" gorm:"column:record_id;primary_key"`
 	UserId       string    `json:"user_id" gorm:"column:user_id"`

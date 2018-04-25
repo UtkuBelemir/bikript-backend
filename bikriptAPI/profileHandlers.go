@@ -14,7 +14,7 @@ import (
 func (bkHand BikriptHandlers) ProfileDetails(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
 	//TODO : ERROR HANDLİNG
-	if req.Method == http.MethodPost {
+	if req.Method == http.MethodPut {
 		var tempUserData bikriptModels.UserInfo
 		json.NewDecoder(req.Body).Decode(&tempUserData)
 		if tempUserData.Email == "" {
@@ -31,19 +31,21 @@ func (bkHand BikriptHandlers) ProfileDetails(wri http.ResponseWriter, req *http.
 			return
 		}
 		json.NewEncoder(wri).Encode(UpdateSuccess)
+	}else if req.Method == http.MethodGet{
+		var tempUserData bikriptModels.UserInfoGET
+		tokenData,err := JWTData(req.Header.Get("Authorization"))
+		if err != nil{
+			fmt.Println("HATA  ProfileDetailsGET ---> : ",err)
+		}
+		bkHand.DBConnection.DBConneciton.First(&tempUserData, "email = ?",tokenData["email"])
+		if tempUserData.Email == ""{
+			fmt.Println("HATA 2 ProfileDetailsGET ---> : ",err)
+		}else{
+			json.NewEncoder(wri).Encode(tempUserData)
+		}
 	}
 }
-func (bkHand BikriptHandlers) ProfileDetailsPUT(wri http.ResponseWriter, req *http.Request) {
 
-	SetCORS(wri)
-	if req.Method != http.MethodPut {
-		bkHand.MethodNotAllowed(wri, http.StatusMethodNotAllowed)
-		return
-	} else {
-
-	}
-	//Name,Surname,Phone,BirthDay
-}
 func (bkHand BikriptHandlers) AccountVerificationPOST(wri http.ResponseWriter, req *http.Request) {
 	SetCORS(wri)
 	if req.Method != http.MethodPost {
