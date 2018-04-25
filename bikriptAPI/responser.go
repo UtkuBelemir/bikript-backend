@@ -13,7 +13,10 @@ var(
 	PhoneNumberInUse = ResponseError{Error:"phone_number_in_use"}
 	SignUpSuccess = make(map[string]string)
 	UpdateSuccess = make(map[string]string)
+	ActivationSuccess = make(map[string]string)
 	EmailOrPassWrong = ResponseError{Error:"email_or_password_wrong"}
+	ActivationCodeIsNotValid = ResponseError{Error:"activation_code_is_not_valid"}
+	ActivarionCodeExpired = ResponseError{Error:"activation_code_is_expired"}
 	PasswordNotNull = ResponseError{Error:"password_cannot_be_null"}
 	EmailNotNull = ResponseError{Error:"email_cannot_be_null"}
 	PhoneNumberNotNull = ResponseError{Error:"phone_number_cannot_be_null"}

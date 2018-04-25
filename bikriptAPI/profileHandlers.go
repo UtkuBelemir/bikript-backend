@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"fmt"
 	bikriptModels "../bikriptDatabase/models"
+	"time"
 )
 
 //ENDPOINT IS : www.bikript.com/bk-api/ {{ function-name-with-lowercase-without-method }}
@@ -101,7 +102,7 @@ func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Reque
 	} else {
 		var tempUserData, fetchedUser bikriptModels.UserInfo
 		json.NewDecoder(req.Body).Decode(&tempUserData)
-		if len(tempUserData.Email) <= 0 || len(tempUserData.Password) <= 8 {
+		if len(tempUserData.Email) <= 0 || len(tempUserData.Password) < 8 {
 			json.NewEncoder(wri).Encode(EmailOrPassWrong)
 			return
 		}
@@ -123,6 +124,37 @@ func (bkHand BikriptHandlers) LoginPOST(wri http.ResponseWriter, req *http.Reque
 		}
 		rTok.Email = fetchedUser.Email
 		json.NewEncoder(wri).Encode(rTok)
+		return
+	}
+}
+func (bkHand BikriptHandlers) EmailActivationPOST(wri http.ResponseWriter,req *http.Request){
+	SetCORS(wri)
+	if req.Method != http.MethodPost {
+		bkHand.MethodNotAllowed(wri, 405)
+		return
+	} else {
+		var fetchedActivationData,selectedActivationData bikriptModels.ActivationCodes
+		json.NewDecoder(req.Body).Decode(&fetchedActivationData)
+		if len(fetchedActivationData.Code) <= 0 {
+			json.NewEncoder(wri).Encode(ActivationCodeIsNotValid)
+			return
+		}
+		bkHand.DBConnection.DBConneciton.First(&selectedActivationData, "code = ? and expires_at >= ?", fetchedActivationData.Code,time.Now())
+		if selectedActivationData.UserId == "" {
+			json.NewEncoder(wri).Encode(ActivationCodeIsNotValid)
+			return
+		}else{
+			if selectedActivationData.Type == "email" {
+				bkHand.DBConnection.DBConneciton.Model(&bikriptModels.UserInfo{}).Debug().Where("email = ?", selectedActivationData.UserId).Updates(&bikriptModels.UserInfo{EmailVerified: true})
+			}
+			if selectedActivationData.Type == "sms" {
+				bkHand.DBConnection.DBConneciton.Model(&bikriptModels.UserInfo{}).Debug().Where("email = ?", selectedActivationData.UserId).Updates(&bikriptModels.UserInfo{PhoneVerified: true})
+			}
+			if selectedActivationData.Type == "twofa" {
+				bkHand.DBConnection.DBConneciton.Model(&bikriptModels.UserInfo{}).Debug().Where("email = ?", selectedActivationData.UserId).Updates(&bikriptModels.UserInfo{TwoFaVerified: true})
+			}
+			json.NewEncoder(wri).Encode(ActivationSuccess)
+		}
 		return
 	}
 }

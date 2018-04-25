@@ -8,6 +8,7 @@ import (
 type UserInfo struct {
 	Email               string          `json:"email" gorm:"column:email;primary_key;default"`
 	PhoneNumber         string          `json:"phone_number" gorm:"column:phone_number;default"`
+	PhoneNumberPre      string        	`json:"phone_number_pre" gorm:"column:phone_number_pre;default"`
 	Password            string          `json:"password" gorm:"column:password;default"`
 	IsVerified          bool            `json:"is_verified" gorm:"column:is_verified;default"`
 	Referrer            string          `json:"referrer" gorm:"column:referrer;default"`
@@ -17,6 +18,9 @@ type UserInfo struct {
 	DocumentNumber      string          `json:"document_number" gorm:"document_number;default"`
 	DocumentPicturePath string          `json:"document_picture_path" gorm:"document_picture_path;default"`
 	SelfiePicturePath   string          `json:"selfie_picture_path" gorm:"selfie_picture_path;default"`
+	EmailVerified		bool			`json:"email_verified" gorm:"email_verified"`
+	PhoneVerified		bool			`json:"phone_verified" gorm:"phone_verified"`
+	TwoFaVerified		bool			`json:"two_fa_verified" gorm:"two_fa_verified"`
 }
 func (UserInfo) TableName() string {
 	return "sc_user.users"
@@ -110,7 +114,8 @@ func (SMSQueue) TableName() string {
 type ActivationCodes struct {
 	UserId    string `json:"user_id" gorm:"column:user_id"`
 	Code      string `json:"code" gorm:"column:code"`
-	Type      string `json:"type" gorm:"column:type"` // sms or email
+	Type      string `json:"code_type" gorm:"column:code_type"` // sms or email
+	Reason	  string `json:"reason" gorm:"column:reason"`
 	ExpiresAt string `json:"expires_at" gorm:"column:expires_at;default"`
 }
 func (ActivationCodes) TableName() string {
@@ -133,3 +138,18 @@ type LogsMdl struct {
 	Device    string    `json:"transaction_date" gorm:"column:transaction_date"`
 	Status    int       `json:"transaction_date" gorm:"column:transaction_date"`
 }
+
+type EmailModel struct {
+	RecordId			string	`json:"email" gorm:"column:record_id;primary_key;default"`
+	EmailSubject		string	`json:"email" gorm:"column:email_subject"`
+	HtmlContent			string	`json:"email" gorm:"column:html_content"`
+	InsertDate			string	`json:"email" gorm:"column:insert_date"`
+	PlainTextContent	string	`json:"email" gorm:"column:plain_text_content"`
+	SendDate			time.Time	`json:"email" gorm:"column:send_date"`
+	SendTo				string	`json:"email" gorm:"column:send_to"`
+	Status				int	`json:"email" gorm:"column:status"`
+}
+func (em EmailModel) TableName() string {
+	return "sc_queue.mail_queue"
+}
+
